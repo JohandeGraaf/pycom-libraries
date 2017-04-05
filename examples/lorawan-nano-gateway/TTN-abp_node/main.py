@@ -3,14 +3,15 @@ import socket
 import binascii
 import struct
 import time
+import config
 
 # Initialize LoRa in LORAWAN mode.
 lora = LoRa(mode=LoRa.LORAWAN)
 
 # create an ABP authentication params
-dev_addr = struct.unpack(">l", binascii.unhexlify('26 01 14 7D'.replace(' ','')))[0]
-nwk_swkey = binascii.unhexlify('3C74F4F40CAE2221303BC24284FCF3AF'.replace(' ',''))
-app_swkey = binascii.unhexlify('0FFA7072CC6FF69A102A0F39BEB0880F'.replace(' ',''))
+dev_addr = struct.unpack(">l", binascii.unhexlify(config.DEV_ADDR.replace(' ','')))[0]
+nwk_swkey = binascii.unhexlify(config.NWK_SWKEY.replace(' ',''))
+app_swkey = binascii.unhexlify(config.APP_SWKEY.replace(' ',''))
 
 # join a network using ABP (Activation By Personalization)
 lora.join(activation=LoRa.ABP, auth=(dev_addr, nwk_swkey, app_swkey))
@@ -33,10 +34,17 @@ s.setsockopt(socket.SOL_LORA, socket.SO_DR, 5)
 # make the socket blocking
 s.setblocking(False)
 
-for i in range (200):
+for i in range (2000):
+    pycom.rgbled(0x007f700) # green
     s.send(b'PKT #' + bytes([i]))
-    time.sleep(4)
+    print('sending ' + str(i))
+    time.sleep(.5)    
+    pycom.rgbled(0)	
+    time.sleep(3.5)
     rx = s.recv(256)
     if rx:
+        pycom.rgbled(0x00007F) # blue    
         print(rx)
-    time.sleep(6)
+        time.sleep(1)    
+        pycom.rgbled(0)
+    time.sleep(30)
