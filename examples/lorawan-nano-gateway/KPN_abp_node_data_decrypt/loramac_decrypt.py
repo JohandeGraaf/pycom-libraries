@@ -1,6 +1,7 @@
 
 import random
 import sys
+from sys import argv
 from binascii import unhexlify
 
 from cryptography.hazmat.backends import default_backend
@@ -108,3 +109,4 @@ def generate_appskey():
     '''Generate a random secret key'''
     return ''.join('{:02X}'.format(x) for x in random.sample(range(255), 16))
 
+print(loramac_decrypt(argv[1], int(argv[2]), argv[3], argv[4]))
